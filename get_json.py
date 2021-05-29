@@ -1,41 +1,41 @@
 from requests import get
+import logging
+
 def main(args):
 
-    logger = setupLogger(args.debug)
+    setupLogger(args.debug)
 
     userName = args.userName
     url = f"https://api.chess.com/pub/player/{userName}" 
 
-    logger.debug(f"Using url {url}")
+    logging.debug(f"Using url {url}")
 
-    logger.info("Retrieving info")
+    logging.info("Retrieving info...")
     r = get(url)
-    print(r.status_code)
 
-    logger.debug(r.json())
+    # did we get the data OK?
+    OK = handleResponse(r.status_code)
+    if not OK:
+        exit(1)
+
+    logging.debug(r.json())
+
+#====================================================================================================
+
+def handleResponse(status_code):
+    # ref: https://www.chess.com/news/view/published-data-api
+    if status_code != 200:
+        logging.critical("Could not obtain data")
+        return False
+    return True
 
 #====================================================================================================
 
 def setupLogger(doDebug):
     """ setup logger """
 
-    import logging
-
     level = logging.INFO if not doDebug else logging.DEBUG
-
-    logging.basicConfig()
-    logging.root.setLevel(level)
-    logging.basicConfig(level = level)
-
-    logger  = logging.getLogger(__name__)
-    handler = logging.StreamHandler()
-    handler.setLevel(level)
-
-    formatter = logging.Formatter("%(levelname)s: %(message)s")
-    handler.setFormatter(formatter)
-
-    logger.addHandler(handler)
-    return logger
+    logging.basicConfig(level = level, format = "%(levelname)s: %(message)s")
 
 #====================================================================================================
 
