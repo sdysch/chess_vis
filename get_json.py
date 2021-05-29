@@ -1,16 +1,25 @@
 from requests import get
-from utils.string_utils import INFO, DEBUG
+import logging
 
 def main(args):
+
+    setupLogger(args.debug)
 
     userName = args.userName
     url = f"https://api.chess.com/pub/player/{userName}" 
 
-    args.debug and DEBUG(f"Using url {url}")
+    logging.debug(f"Using url {url}")
 
+    logging.info("Retrieving info")
     r = get(url)
 
-    args.debug and print(r.json())
+    logging.debug(r.json())
+
+#====================================================================================================
+
+def setupLogger(doDebug):
+    level = logging.INFO if not args.debug else logging.DEBUG
+    logging.basicConfig(level = level, format = "%(levelname)s: %(message)s")
 
 #====================================================================================================
 
