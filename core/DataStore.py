@@ -35,13 +35,13 @@ class DataStore:
 
         self.logger.info(f"Obtaining current ratings for {self.userName}")
 
-        data = get_player_stats(self.userName).json["stats"]
+        self.player_stats = get_player_stats(self.userName).json["stats"]
         categories = ["chess_blitz", "chess_rapid", "chess_bullet", "chess_daily"]
 
         # get and store all ratings
         self.playerRatings = {}
         for category in categories:
-            rating = data[category]["last"]["rating"]
+            rating = self.player_stats[category]["last"]["rating"]
             self.playerRatings[category] = rating
 
             self.logger.debug(f"{category} rating: {rating}")
