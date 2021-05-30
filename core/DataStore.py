@@ -51,7 +51,7 @@ class DataStore:
     def printCurrentPlayerRatings(self):
         """ Print this player's current chess.com ratings """
 
-        if not self.playerRatings:
+        if not hasattr(self, "playerRatings"):
             self.logger.debug("Current player ratings not known, obtaining now....")
             self.getCurrentPlayerRatings()
 
