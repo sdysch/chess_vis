@@ -1,12 +1,7 @@
 import requests
 import logging
-from chessdotcom import get_leaderboards, get_player_stats, get_player_game_archives
+from chessdotcom import get_player_stats, get_player_game_archives
 import pprint
-
-#====================================================================================================
-
-# create module logger
-module_logger = logging.getLogger(__name__)
 
 #====================================================================================================
 
@@ -22,28 +17,42 @@ class DataStore:
         # pretty printing
         self.printer = pprint.PrettyPrinter()
 
-        self.logger.debug(f"Setup logger for chess.com user {self.userName}")
+        self.logger.debug(f"Setup chess.com user {self.userName}")
 
     #====================================================================================================
 
     def setupLogger(self):
         """ setup logger """
 
-        # top logging level
         level = logging.INFO
+        logging.basicConfig(level = level, format = "%(levelname)s: %(message)s")
+        self.logger = logging.getLogger(__name__)
 
-        # setup basic logging
-        logging.basicConfig(level = level)
+    #====================================================================================================
 
-        # configure stream handler
-        formatter = logging.Formatter("%(levelname)s: %(message)s")
+    def getCurrentPlayerRatings(self):
+        """ Get this player's current chess.com ratings """
 
-        streamHandler = logging.StreamHandler()
-        streamHandler.setLevel(level)
-        streamHandler.setFormatter(formatter)
+        self.logger.info(f"Obtaining current ratings for {self.userName}")
 
-        # add stream handler to logger
-        self.logger = logging.getLogger(__name__ + ".DataStore")
-        self.logger.addHandler(streamHandler)
+        data = get_player_stats(self.userName).json["stats"]
+        categories = ["chess_blitz", "chess_rapid", "chess_bullet", "chess_daily"]
 
-#====================================================================================================
+        # get and store all ratings
+        self.playerRatings = {}
+        for category in categories:
+            rating = data[category]["last"]["rating"]
+            self.playerRatings[category] = rating
+
+            self.logger.debug(f"{category} rating: {rating}")
+
+    #====================================================================================================
+
+    def printCurrentPlayerRatings(self):
+        """ Print this player's current chess.com ratings """
+
+        if not self.playerRatings:
+            self.logger.debug("Current player ratings not known, obtaining now....")
+            self.getCurrentPlayerRatings()
+
+        self.printer.pprint(self.playerRatings)

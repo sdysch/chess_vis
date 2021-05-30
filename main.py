@@ -4,6 +4,8 @@ def main(args):
 
     # setup data store
     store = DataStore.DataStore(args.userName)
+    store.getCurrentPlayerRatings()
+    store.printCurrentPlayerRatings()
 
 
 #====================================================================================================
